@@ -1,0 +1,83 @@
+{
+  "ntfy_topic": "",
+  "default_min_profit": 15.0,
+  "skip_red_flags": true,
+  "use_price_guide": true,
+  "use_ai": false,
+  "anthropic_api_key": "",
+  "ai_min_confidence": 70,
+  "watches": [
+    {
+      "query": "Shure SM57",
+      "enabled": true,
+      "min_profit": 15,
+      "max_buy_price": 80,
+      "scan_limit": 30,
+      "condition_slugs": [],
+      "notes": "Classic dynamic mic — very high liquidity, sells fast"
+    },
+    {
+      "query": "Shure SM58",
+      "enabled": true,
+      "min_profit": 15,
+      "max_buy_price": 80,
+      "scan_limit": 30,
+      "condition_slugs": [],
+      "notes": "Companion to SM57 — equally liquid"
+    },
+    {
+      "query": "Focusrite Scarlett Solo",
+      "enabled": true,
+      "min_profit": 20,
+      "max_buy_price": 70,
+      "scan_limit": 30,
+      "condition_slugs": [],
+      "notes": "Best-selling audio interface — huge market"
+    },
+    {
+      "query": "Focusrite Scarlett 2i2",
+      "enabled": true,
+      "min_profit": 25,
+      "max_buy_price": 100,
+      "scan_limit": 30,
+      "condition_slugs": [],
+      "notes": "2i2 commands more than Solo — watch for gen2/gen3 underpriced"
+    },
+    {
+      "query": "Boss DS-1",
+      "enabled": true,
+      "min_profit": 12,
+      "max_buy_price": 35,
+      "scan_limit": 30,
+      "condition_slugs": [],
+      "notes": "Ubiquitous distortion pedal — tiny margins but moves fast"
+    },
+    {
+      "query": "Boss TU-3",
+      "enabled": true,
+      "min_profit": 15,
+      "max_buy_price": 55,
+      "scan_limit": 30,
+      "condition_slugs": [],
+      "notes": "Most popular tuner pedal — always selling"
+    },
+    {
+      "query": "Electro-Harmonix Big Muff",
+      "enabled": false,
+      "min_profit": 20,
+      "max_buy_price": 65,
+      "scan_limit": 30,
+      "condition_slugs": [],
+      "notes": "Enable when you have capital — good margins on older versions"
+    },
+    {
+      "query": "MXR Phase 90",
+      "enabled": false,
+      "min_profit": 18,
+      "max_buy_price": 60,
+      "scan_limit": 30,
+      "condition_slugs": [],
+      "notes": "Iconic phaser — vintage block logo versions worth more"
+    }
+  ]
+}
