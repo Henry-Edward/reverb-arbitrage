@@ -1,6 +1,6 @@
 {
-  "ntfy_topic": "",
-  "default_min_profit": 15.0,
+  "ntfy_topic": "reverb-deals-johnson42",
+  "default_min_profit": 15,
   "skip_red_flags": true,
   "use_price_guide": true,
   "use_ai": false,
@@ -13,8 +13,7 @@
       "min_profit": 15,
       "max_buy_price": 80,
       "scan_limit": 30,
-      "condition_slugs": [],
-      "notes": "Classic dynamic mic — very high liquidity, sells fast"
+      "condition_slugs": []
     },
     {
       "query": "Shure SM58",
@@ -22,8 +21,7 @@
       "min_profit": 15,
       "max_buy_price": 80,
       "scan_limit": 30,
-      "condition_slugs": [],
-      "notes": "Companion to SM57 — equally liquid"
+      "condition_slugs": []
     },
     {
       "query": "Focusrite Scarlett Solo",
@@ -31,8 +29,7 @@
       "min_profit": 20,
       "max_buy_price": 70,
       "scan_limit": 30,
-      "condition_slugs": [],
-      "notes": "Best-selling audio interface — huge market"
+      "condition_slugs": []
     },
     {
       "query": "Focusrite Scarlett 2i2",
@@ -40,8 +37,7 @@
       "min_profit": 25,
       "max_buy_price": 100,
       "scan_limit": 30,
-      "condition_slugs": [],
-      "notes": "2i2 commands more than Solo — watch for gen2/gen3 underpriced"
+      "condition_slugs": []
     },
     {
       "query": "Boss DS-1",
@@ -49,8 +45,7 @@
       "min_profit": 12,
       "max_buy_price": 35,
       "scan_limit": 30,
-      "condition_slugs": [],
-      "notes": "Ubiquitous distortion pedal — tiny margins but moves fast"
+      "condition_slugs": []
     },
     {
       "query": "Boss TU-3",
@@ -58,8 +53,7 @@
       "min_profit": 15,
       "max_buy_price": 55,
       "scan_limit": 30,
-      "condition_slugs": [],
-      "notes": "Most popular tuner pedal — always selling"
+      "condition_slugs": []
     },
     {
       "query": "Electro-Harmonix Big Muff",
@@ -67,8 +61,7 @@
       "min_profit": 20,
       "max_buy_price": 65,
       "scan_limit": 30,
-      "condition_slugs": [],
-      "notes": "Enable when you have capital — good margins on older versions"
+      "condition_slugs": []
     },
     {
       "query": "MXR Phase 90",
@@ -76,8 +69,7 @@
       "min_profit": 18,
       "max_buy_price": 60,
       "scan_limit": 30,
-      "condition_slugs": [],
-      "notes": "Iconic phaser — vintage block logo versions worth more"
+      "condition_slugs": []
     }
   ]
 }
