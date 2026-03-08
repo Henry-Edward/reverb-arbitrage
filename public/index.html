@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReverbArb — Control Panel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne+Mono&family=Syne:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080909;
+    --s1: #0f1011;
+    --s2: #161719;
+    --s3: #1e2022;
+    --border: #2c2f33;
+    --border2: #3a3e44;
+    --acc: #00e5a0;
+    --acc2: #ff6b35;
+    --acc3: #ffd166;
+    --text: #eef0f2;
+    --sub: #8a9099;
+    --danger: #ff4757;
+    --grade-a: #00e5a0;
+    --grade-b: #ffd166;
+    --grade-c: #8a9099;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE TEXTURE ── */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9998;
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(8,9,9,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .wordmark {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 4px;
+    color: var(--acc);
+    text-shadow: 0 0 24px rgba(0,229,160,0.3);
+  }
+
+  .wordmark em { color: var(--text); font-style: normal; }
+
+  .header-divider { width: 1px; height: 20px; background: var(--border2); }
+
+  .header-tag {
+    font-family: 'Syne Mono', monospace;
+    font-size: 10px;
+    color: var(--sub);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .header-actions { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+
+  .pulse { width: 7px; height: 7px; border-radius: 50%; background: var(--acc); animation: pulse 2s infinite; }
+  .pulse.off { background: var(--sub); animation: none; }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(0,229,160,0.4); }
+    50% { box-shadow: 0 0 0 5px rgba(0,229,160,0); }
+  }
+
+  .ntfy-status {
+    font-family: 'Syne Mono', monospace;
+    font-size: 10px;
+    color: var(--sub);
+    letter-spacing: 1px;
+  }
+
+  /* ── LAYOUT ── */
+  .main { max-width: 1080px; margin: 0 auto; padding: 40px; }
+
+  /* ── STATS BAR ── */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); margin-bottom: 40px; }
+
+  .stat { background: var(--s1); padding: 20px 24px; }
+
+  .stat-n {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    line-height: 1;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+
+  .stat-n.green { color: var(--acc); }
+  .stat-n.amber { color: var(--acc3); }
+  .stat-n.orange { color: var(--acc2); }
+  .stat-n.muted { color: var(--sub); }
+
+  .stat-l {
+    font-family: 'Syne Mono', monospace;
+    font-size: 10px;
+    color: var(--sub);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  /* ── SECTIONS ── */
+  .sections { display: grid; grid-template-columns: 340px 1fr; gap: 24px; align-items: start; }
+
+  .panel {
+    background: var(--s1);
+    border: 1px solid var(--border);
+  }
+
+  .panel-head {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .panel-title {
+    font-family: 'Syne Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--sub);
+  }
+
+  .panel-body { padding: 20px; }
+
+  /* ── FORM ELEMENTS ── */
+  .field { margin-bottom: 18px; }
+  .field:last-child { margin-bottom: 0; }
+
+  .field-label {
+    font-family: 'Syne Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--sub);
+    margin-bottom: 7px;
+    display: block;
+  }
+
+  .field-hint {
+    font-size: 11px;
+    color: var(--sub);
+    line-height: 1.6;
+    margin-top: 5px;
+    opacity: 0.8;
+  }
+
+  input[type=text], input[type=number], input[type=password] {
+    width: 100%;
+    background: var(--s2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Syne Mono', monospace;
+    font-size: 13px;
+    padding: 10px 12px;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    -webkit-appearance: none;
+  }
+
+  input:focus {
+    border-color: var(--acc);
+    box-shadow: 0 0 0 2px rgba(0,229,160,0.1);
+  }
+
+  input::placeholder { color: var(--border2); }
+
+  /* ── TOGGLE ── */
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+    cursor: pointer;
+  }
+
+  .toggle-row:last-child { margin-bottom: 0; }
+
+  .tog {
+    position: relative;
+    width: 40px;
+    height: 22px;
+    flex-shrink: 0;
+  }
+
+  .tog input { opacity: 0; width: 0; height: 0; }
+
+  .tog-track {
+    position: absolute;
+    inset: 0;
+    background: var(--s3);
+    border: 1px solid var(--border2);
+    border-radius: 22px;
+    transition: 0.2s;
+  }
+
+  .tog-track::before {
+    content: '';
+    position: absolute;
+    width: 14px; height: 14px;
+    left: 3px; top: 3px;
+    background: var(--sub);
+    border-radius: 50%;
+    transition: 0.2s;
+  }
+
+  .tog input:checked + .tog-track {
+    background: rgba(0,229,160,0.15);
+    border-color: var(--acc);
+  }
+
+  .tog input:checked + .tog-track::before {
+    transform: translateX(18px);
+    background: var(--acc);
+  }
+
+  .tog-label { font-size: 13px; color: var(--text); line-height: 1.4; }
+  .tog-label small { display: block; font-size: 11px; color: var(--sub); margin-top: 2px; }
+
+  /* ── BUTTONS ── */
+  .btn {
+    background: var(--acc);
+    color: #000;
+    border: none;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 15px;
+    letter-spacing: 2px;
+    padding: 11px 22px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .btn:hover { background: #00ffb3; transform: translateY(-1px); }
+  .btn:active { transform: translateY(0); }
+  .btn:disabled { background: var(--s3); color: var(--sub); cursor: not-allowed; transform: none; }
+
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--border2);
+    color: var(--sub);
+    font-family: 'Syne Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    padding: 9px 16px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-transform: uppercase;
+  }
+
+  .btn-outline:hover { border-color: var(--acc); color: var(--acc); }
+
+  .btn-danger-outline {
+    background: transparent;
+    border: 1px solid rgba(255,71,87,0.3);
+    color: rgba(255,71,87,0.6);
+    font-family: 'Syne Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    padding: 9px 16px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-transform: uppercase;
+  }
+
+  .btn-danger-outline:hover { border-color: var(--danger); color: var(--danger); }
+
+  .btn-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); }
+
+  /* ── WATCHES ── */
+  .watches-wrap { display: flex; flex-direction: column; gap: 10px; }
+
+  .watch-card {
+    background: var(--s2);
+    border: 1px solid var(--border);
+    padding: 16px;
+    transition: border-color 0.15s;
+    position: relative;
+  }
+
+  .watch-card:hover { border-color: var(--border2); }
+  .watch-card.disabled { opacity: 0.45; }
+
+  .watch-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .watch-query-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--border2);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 2px 0 6px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .watch-query-input:focus { border-color: var(--acc); }
+  .watch-query-input::placeholder { color: var(--border2); font-weight: 400; }
+
+  .watch-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .watch-field label {
+    font-family: 'Syne Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--sub);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .watch-field input {
+    padding: 7px 9px;
+    font-size: 13px;
+    margin-bottom: 0;
+  }
+
+  .cond-wrap { margin-bottom: 4px; }
+
+  .cond-label {
+    font-family: 'Syne Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--sub);
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  .cond-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+
+  .chip {
+    font-family: 'Syne Mono', monospace;
+    font-size: 10px;
+    padding: 4px 9px;
+    border: 1px solid var(--border);
+    color: var(--sub);
+    cursor: pointer;
+    transition: all 0.12s;
+    user-select: none;
+  }
+
+  .chip:hover { border-color: var(--border2); color: var(--text); }
+  .chip.on { border-color: var(--acc); color: var(--acc); background: rgba(0,229,160,0.07); }
+
+  .watch-remove {
+    background: transparent;
+    border: none;
+    color: var(--sub);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 2px 6px;
+    transition: color 0.15s;
+    flex-shrink: 0;
+  }
+
+  .watch-remove:hover { color: var(--danger); }
+
+  .add-watch-btn {
+    border: 1px dashed var(--border2);
+    padding: 14px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: var(--sub);
+    font-family: 'Syne Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  .add-watch-btn:hover { border-color: var(--acc); color: var(--acc); background: rgba(0,229,160,0.03); }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    background: var(--s2);
+    border: 1px solid var(--acc);
+    color: var(--acc);
+    font-family: 'Syne Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 1px;
+    padding: 12px 18px;
+    z-index: 9999;
+    transform: translateY(20px);
+    opacity: 0;
+    transition: all 0.25s;
+    pointer-events: none;
+    max-width: 320px;
+  }
+
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.err { border-color: var(--danger); color: var(--danger); }
+
+  /* ── LOADING OVERLAY ── */
+  .spinner {
+    display: inline-block;
+    width: 14px; height: 14px;
+    border: 2px solid rgba(0,229,160,0.2);
+    border-top-color: var(--acc);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── AI SECTION ── */
+  .ai-badge {
+    font-family: 'Syne Mono', monospace;
+    font-size: 9px;
+    padding: 3px 7px;
+    border: 1px solid rgba(255,107,53,0.4);
+    color: rgba(255,107,53,0.7);
+    letter-spacing: 1px;
+  }
+
+  /* ── SEPARATOR ── */
+  .sep { height: 1px; background: var(--border); margin: 20px 0; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 860px) {
+    header { padding: 0 20px; }
+    .main { padding: 24px 20px; }
+    .sections { grid-template-columns: 1fr; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .watch-fields { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wordmark">Reverb<em>Arb</em></div>
+  <div class="header-divider"></div>
+  <div class="header-tag">Control Panel</div>
+  <div class="header-actions">
+    <div class="pulse" id="pulseDot"></div>
+    <div class="ntfy-status" id="ntfyStatus">loading...</div>
+  </div>
+</header>
+
+<div class="main">
+
+  <div class="stats" id="statsBar">
+    <div class="stat">
+      <div class="stat-n green" id="statWatches">—</div>
+      <div class="stat-l">Active Watches</div>
+    </div>
+    <div class="stat">
+      <div class="stat-n amber" id="statProfit">$—</div>
+      <div class="stat-l">Min Profit</div>
+    </div>
+    <div class="stat">
+      <div class="stat-n orange" id="statFlags">ON</div>
+      <div class="stat-l">Red Flag Filter</div>
+    </div>
+    <div class="stat">
+      <div class="stat-n muted" id="statAI">OFF</div>
+      <div class="stat-l">AI Scoring</div>
+    </div>
+  </div>
+
+  <div class="sections">
+
+    <!-- LEFT PANEL: Global Settings -->
+    <div>
+      <div class="panel" style="margin-bottom:16px;">
+        <div class="panel-head">
+          <div class="panel-title">Notifications</div>
+        </div>
+        <div class="panel-body">
+          <div class="field">
+            <label class="field-label">ntfy.sh Topic</label>
+            <input type="text" id="ntfyTopic" placeholder="my-reverb-alerts-xyz">
+            <div class="field-hint">
+              Your unique alert channel. Install the ntfy app → subscribe to this topic → deals appear on your phone instantly.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-bottom:16px;">
+        <div class="panel-head">
+          <div class="panel-title">Scan Settings</div>
+        </div>
+        <div class="panel-body">
+          <div class="field">
+            <label class="field-label">Default Min Profit ($)</label>
+            <input type="number" id="defaultProfit" placeholder="15" min="0" step="1">
+            <div class="field-hint">Each watch can override this. Start loose, tighten over time.</div>
+          </div>
+
+          <div class="sep"></div>
+
+          <label class="toggle-row" for="togRedFlags">
+            <label class="tog">
+              <input type="checkbox" id="togRedFlags">
+              <span class="tog-track"></span>
+            </label>
+            <span class="tog-label">
+              Skip red flag listings
+              <small>"as-is", "untested", "for parts", "needs repair"</small>
+            </span>
+          </label>
+
+          <label class="toggle-row" for="togPriceGuide">
+            <label class="tog">
+              <input type="checkbox" id="togPriceGuide" checked>
+              <span class="tog-track"></span>
+            </label>
+            <span class="tog-label">
+              Use Price Guide API
+              <small>Real sold transaction data — more accurate than estimates</small>
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title">AI Scoring</div>
+          <div class="ai-badge">FUTURE</div>
+        </div>
+        <div class="panel-body">
+          <label class="toggle-row">
+            <label class="tog">
+              <input type="checkbox" id="togAI" disabled>
+              <span class="tog-track"></span>
+            </label>
+            <span class="tog-label" style="color:var(--sub)">
+              Enable AI deal analysis
+              <small>Analyzes listing text for nuanced signals beyond keywords</small>
+            </span>
+          </label>
+
+          <div class="field" style="margin-top:14px;">
+            <label class="field-label">Anthropic API Key</label>
+            <input type="password" id="anthropicKey" placeholder="sk-ant-... (when ready)">
+          </div>
+
+          <div class="field">
+            <label class="field-label">Min AI Confidence (0–100)</label>
+            <input type="number" id="aiConfidence" value="70" min="0" max="100">
+            <div class="field-hint">Only alert when AI scores above this threshold.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL: Watches -->
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title">Search Watches</div>
+        <button class="btn-outline" onclick="addWatch()">+ Add Watch</button>
+      </div>
+      <div class="panel-body">
+        <div class="watches-wrap" id="watchesList"></div>
+        <div class="add-watch-btn" style="margin-top:10px;" onclick="addWatch()">+ Add New Watch</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Save Row -->
+  <div class="btn-row">
+    <button class="btn" id="saveBtn" onclick="save()">
+      <span id="saveBtnText">Save Settings</span>
+    </button>
+    <button class="btn-outline" onclick="triggerScan()" id="scanBtn">▶ Scan Now</button>
+    <button class="btn-danger-outline" onclick="confirmResetSeen()">Clear Seen Listings</button>
+    <span id="saveStatus" style="font-family:'Syne Mono',monospace;font-size:11px;color:var(--sub);margin-left:4px;"></span>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── State ──────────────────────────────────────────────────────────────────
+let currentSha = '';
+
+const CONDITIONS = [
+  ['brand-new','New'], ['mint-inventory','Mint (Dealer)'], ['mint','Mint'],
+  ['excellent','Excellent'], ['very-good','Very Good'],
+  ['good','Good'], ['fair','Fair'], ['poor','Poor']
+];
+
+// ── Boot ───────────────────────────────────────────────────────────────────
+async function init() {
+  try {
+    const resp = await fetch('/api/config');
+    const data = await resp.json();
+    if (!data.ok) throw new Error(data.error);
+    loadConfig(data.config);
+  } catch (e) {
+    toast('Failed to load config: ' + e.message, true);
+    document.getElementById('ntfyStatus').textContent = 'error';
+  }
+}
+
+function loadConfig(cfg) {
+  currentSha = cfg._sha || '';
+
+  document.getElementById('ntfyTopic').value = cfg.ntfy_topic || '';
+  document.getElementById('defaultProfit').value = cfg.default_min_profit ?? 15;
+  document.getElementById('togRedFlags').checked = cfg.skip_red_flags !== false;
+  document.getElementById('togPriceGuide').checked = cfg.use_price_guide !== false;
+  document.getElementById('togAI').checked = cfg.use_ai || false;
+  document.getElementById('anthropicKey').value = cfg.anthropic_api_key || '';
+  document.getElementById('aiConfidence').value = cfg.ai_min_confidence ?? 70;
+
+  // Watches
+  const list = document.getElementById('watchesList');
+  list.innerHTML = '';
+  (cfg.watches || []).forEach(w => renderWatch(w));
+
+  updateStats(cfg);
+  updateNtfyStatus(cfg.ntfy_topic);
+}
+
+function updateStats(cfg) {
+  const watches = (cfg.watches || []).filter(w => w.enabled !== false);
+  document.getElementById('statWatches').textContent = watches.length;
+  document.getElementById('statProfit').textContent = '$' + (cfg.default_min_profit ?? 15);
+  document.getElementById('statFlags').textContent = cfg.skip_red_flags !== false ? 'ON' : 'OFF';
+  document.getElementById('statAI').textContent = cfg.use_ai ? 'ON' : 'OFF';
+}
+
+function updateNtfyStatus(topic) {
+  const dot = document.getElementById('pulseDot');
+  const lbl = document.getElementById('ntfyStatus');
+  if (topic) {
+    dot.className = 'pulse';
+    lbl.textContent = topic;
+  } else {
+    dot.className = 'pulse off';
+    lbl.textContent = 'no topic set';
+  }
+}
+
+// ── Watch Renderer ─────────────────────────────────────────────────────────
+function renderWatch(watch = {}) {
+  const list = document.getElementById('watchesList');
+  const enabled = watch.enabled !== false;
+
+  const div = document.createElement('div');
+  div.className = 'watch-card' + (enabled ? '' : ' disabled');
+
+  const condChips = CONDITIONS.map(([slug, label]) => {
+    const on = (watch.condition_slugs || []).includes(slug) ? ' on' : '';
+    return `<div class="chip${on}" data-slug="${slug}" onclick="toggleChip(this)">${label}</div>`;
+  }).join('');
+
+  div.innerHTML = `
+    <div class="watch-top">
+      <label class="tog" title="Enable/disable this watch">
+        <input type="checkbox" class="w-enabled" ${enabled ? 'checked' : ''} onchange="toggleWatchCard(this)">
+        <span class="tog-track"></span>
+      </label>
+      <input type="text" class="watch-query-input w-query" value="${esc(watch.query || '')}" placeholder="Search query (e.g. Fender Stratocaster)">
+      <button class="watch-remove" onclick="this.closest('.watch-card').remove()" title="Remove">✕</button>
+    </div>
+    <div class="watch-fields">
+      <div class="watch-field">
+        <label>Min Profit ($)</label>
+        <input type="number" class="w-profit" value="${watch.min_profit ?? ''}" placeholder="default" min="0" step="1">
+      </div>
+      <div class="watch-field">
+        <label>Max Buy Price ($)</label>
+        <input type="number" class="w-maxbuy" value="${watch.max_buy_price ?? ''}" placeholder="no limit" min="0" step="5">
+      </div>
+      <div class="watch-field">
+        <label>Scan Limit</label>
+        <input type="number" class="w-limit" value="${watch.scan_limit ?? 30}" min="5" max="100">
+      </div>
+    </div>
+    <div class="cond-wrap">
+      <span class="cond-label">Condition Filter — leave empty for all</span>
+      <div class="cond-chips">${condChips}</div>
+    </div>
+  `;
+
+  list.appendChild(div);
+}
+
+function toggleWatchCard(cb) {
+  cb.closest('.watch-card').classList.toggle('disabled', !cb.checked);
+}
+
+function toggleChip(el) { el.classList.toggle('on'); }
+
+function addWatch() {
+  renderWatch({ enabled: true, scan_limit: 30, condition_slugs: [] });
+  // Scroll to new watch
+  const list = document.getElementById('watchesList');
+  list.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ── Collect config from DOM ────────────────────────────────────────────────
+function collectConfig() {
+  const watches = [];
+  document.querySelectorAll('.watch-card').forEach(card => {
+    watches.push({
+      query: card.querySelector('.w-query').value.trim(),
+      enabled: card.querySelector('.w-enabled').checked,
+      min_profit: parseFloat(card.querySelector('.w-profit').value) || null,
+      max_buy_price: parseFloat(card.querySelector('.w-maxbuy').value) || null,
+      scan_limit: parseInt(card.querySelector('.w-limit').value) || 30,
+      condition_slugs: [...card.querySelectorAll('.chip.on')].map(c => c.dataset.slug),
+    });
+  });
+
+  return {
+    ntfy_topic: document.getElementById('ntfyTopic').value.trim(),
+    default_min_profit: parseFloat(document.getElementById('defaultProfit').value) || 15,
+    skip_red_flags: document.getElementById('togRedFlags').checked,
+    use_price_guide: document.getElementById('togPriceGuide').checked,
+    use_ai: document.getElementById('togAI').checked,
+    anthropic_api_key: document.getElementById('anthropicKey').value.trim(),
+    ai_min_confidence: parseInt(document.getElementById('aiConfidence').value) || 70,
+    watches,
+  };
+}
+
+// ── Save ───────────────────────────────────────────────────────────────────
+async function save() {
+  const btn = document.getElementById('saveBtn');
+  const txt = document.getElementById('saveBtnText');
+  btn.disabled = true;
+  txt.innerHTML = '<span class="spinner"></span> Saving...';
+
+  const config = collectConfig();
+
+  try {
+    const resp = await fetch('/api/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ config, sha: currentSha }),
+    });
+    const data = await resp.json();
+
+    if (data.ok) {
+      toast('✓ Saved & committed to GitHub');
+      updateStats(config);
+      updateNtfyStatus(config.ntfy_topic);
+      // Reload to get fresh SHA
+      setTimeout(() => init(), 1500);
+    } else {
+      toast(data.error || 'Save failed', true);
+    }
+  } catch (e) {
+    toast('Network error: ' + e.message, true);
+  } finally {
+    btn.disabled = false;
+    txt.textContent = 'Save Settings';
+  }
+}
+
+// ── Trigger Scan ───────────────────────────────────────────────────────────
+async function triggerScan() {
+  const btn = document.getElementById('scanBtn');
+  btn.disabled = true;
+  btn.textContent = 'Triggering...';
+
+  try {
+    const resp = await fetch('/api/trigger', { method: 'POST' });
+    const data = await resp.json();
+    toast(data.ok
+      ? '✓ Scan triggered — check GitHub Actions for progress'
+      : data.error, !data.ok);
+  } catch (e) {
+    toast('Error: ' + e.message, true);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '▶ Scan Now';
+  }
+}
+
+// ── Reset Seen ─────────────────────────────────────────────────────────────
+function confirmResetSeen() {
+  if (!confirm('Clear all seen listing IDs?\n\nThe next scan will re-evaluate all current listings — you may get alerts for items that were already processed.')) return;
+  toast('To reset seen listings, delete bot/seen_listings.json from your GitHub repo.');
+}
+
+// ── Toast ──────────────────────────────────────────────────────────────────
+let toastTimer;
+function toast(msg, isErr = false) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show' + (isErr ? ' err' : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.className = 'toast', 4000);
+}
+
+// ── Utils ──────────────────────────────────────────────────────────────────
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+}
+
+// ── Init ───────────────────────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>
