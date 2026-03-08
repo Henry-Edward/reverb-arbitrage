@@ -1,6 +1,6 @@
 {
   "ntfy_topic": "reverb-deals-johnson42",
-  "default_min_profit": 15,
+  "default_min_profit": 1,
   "skip_red_flags": true,
   "use_price_guide": true,
   "use_ai": false,
@@ -10,7 +10,7 @@
     {
       "query": "Shure SM57",
       "enabled": true,
-      "min_profit": 15,
+      "min_profit": 1,
       "max_buy_price": 80,
       "scan_limit": 30,
       "condition_slugs": []
@@ -18,7 +18,7 @@
     {
       "query": "Shure SM58",
       "enabled": true,
-      "min_profit": 15,
+      "min_profit": 1,
       "max_buy_price": 120,
       "scan_limit": 30,
       "condition_slugs": []
@@ -26,7 +26,7 @@
     {
       "query": "Focusrite Scarlett Solo",
       "enabled": true,
-      "min_profit": 20,
+      "min_profit": 1,
       "max_buy_price": 70,
       "scan_limit": 30,
       "condition_slugs": []
