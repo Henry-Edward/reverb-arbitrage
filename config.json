@@ -19,7 +19,7 @@
       "query": "Shure SM58",
       "enabled": true,
       "min_profit": 15,
-      "max_buy_price": 80,
+      "max_buy_price": 120,
       "scan_limit": 30,
       "condition_slugs": []
     },
